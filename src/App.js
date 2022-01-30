@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import InputField from './components/InputField'
+import TodoList from './components/TodoList'
+import { addNewTodo, fetchTodos } from './store/totoSlice'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [text, setText] = useState('')
+	const dispatch = useDispatch()
+	const { status, error } = useSelector(({ todos }) => todos)
+
+	const onNewTodo = () => {
+		if (text.trim().length) {
+			dispatch(addNewTodo(text))
+			setText('')
+		}
+	}
+
+	useEffect(() => {
+		dispatch(fetchTodos(5))
+	}, [])
+
+	return (
+		<div>
+			<InputField type='text' placeholder='todo' addNewTodo={onNewTodo} setText={setText} text={text} />
+			{status === 'pending' && <h1>Loading...</h1>}
+			{error && <h2>{error}</h2>}
+
+			<TodoList />
+		</div>
+	)
 }
 
-export default App;
+export default App
